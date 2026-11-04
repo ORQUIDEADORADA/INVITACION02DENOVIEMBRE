@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación Graduación Nivel Inicial - Colegio Liceo Santo Domingo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        santo: {
+                            blue: '#0284C7',
+                            lightBlue: '#38BDF8',
+                            sky: '#E0F2FE',
+                            amber: '#F59E0B',
+                            yellow: '#FBBF24',
+                            softYellow: '#FEF08A',
+                            pink: '#EC4899',
+                            emerald: '#10B981',
+                            purple: '#8B5CF6'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif'],
+                        hand: ['Caveat', 'cursive']
+                    },
+                    animation: {
+                        'float-gentle': 'floatGentle 3.5s ease-in-out infinite',
+                        'bounce-slow': 'bounceSlow 2s infinite',
+                        'star-spin': 'starSpin 10s linear infinite',
+                        'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        floatGentle: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-12px) rotate(2deg)' }
+                        },
+                        bounceSlow: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        starSpin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.08)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 0%, #F0F9FF 0%, #BAE6FD 45%, #FEF08A 100%);
+            color: #0F172A;
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .gradient-title {
+            background: linear-gradient(135deg, #0284C7 0%, #EC4899 45%, #F59E0B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-santo {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 4px solid #38BDF8;
+            box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        .sun-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, rgba(56, 189, 248, 0.2) 50%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .sticker-badge {
+            box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.25);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .sticker-badge:hover {
+            transform: translateY(-6px) scale(1.04) rotate(-1.5deg);
+            box-shadow: 0 18px 35px -6px rgba(2, 132, 199, 0.35);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F0F9FF;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #38BDF8, #F59E0B);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- CANVAS DE PARTÍCULAS Y CHISPAS -->
+    <canvas id="particlesCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- ========================================== -->
+    <!-- INTRODUCCIÓN ANIMADA: LICEO SANTO DOMINGO  -->
+    <!-- ========================================== -->
+    <div id="videoIntroScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-sky-100 transition-opacity duration-1000 overflow-hidden">
+        
+        <canvas id="animationCanvas" class="absolute inset-0 w-full h-full object-cover"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-t from-sky-950/70 via-sky-500/20 to-sky-200/50"></div>
+        
+        <div class="relative w-full max-w-3xl px-6 text-center z-10 flex flex-col items-center">
+            
+            <div id="introLogo" class="opacity-0 transform translate-y-6 transition-all duration-1000 ease-out mb-4">
+                <div class="w-28 h-28 mx-auto rounded-full border-4 border-amber-400 flex items-center justify-center shadow-2xl bg-white/95 backdrop-blur-md animate-bounce-slow text-sky-600 relative">
+                    <i data-lucide="graduation-cap" class="w-14 h-14 text-sky-600"></i>
+                    <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-sky-500 text-white font-fredoka text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold border border-white">2026</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-8 bg-white/90 p-6 sm:p-8 rounded-3xl border-4 border-sky-300 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-sky-200/50 rounded-full blur-2xl pointer-events-none"></div>
+                <p class="font-fredoka tracking-wider text-xs sm:text-sm text-sky-900 font-extrabold uppercase bg-sky-100/90 inline-block px-4 py-1.5 rounded-full border border-sky-300 shadow-sm">IEI 894 Santa Marianita de los niños • 5 Años</p>
+                <h1 class="font-fredoka text-3xl sm:text-6xl font-extrabold gradient-title uppercase tracking-wide leading-tight drop-shadow-sm">
+                    GRADUACIÓN INICIAL 2026
+                </h1>
+                <p class="font-hand text-3xl sm:text-5xl text-pink-600 font-bold">Pequeños líderes del futuro</p>
+            </div>
+
+            <div id="introAction" class="transition-opacity duration-1000">
+                <button id="startExperienceBtn" onclick="playCinematicVideo()" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden font-fredoka font-extrabold text-slate-900 rounded-full bg-gradient-to-r from-sky-400 via-amber-400 to-pink-400 shadow-2xl border-4 border-white hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-3 tracking-wider text-lg text-slate-900 font-black">
+                        <i data-lucide="sparkles" class="w-7 h-7 text-sky-800 animate-spin"></i>
+                        ABRIR INVITACIÓN MÁGICA
+                    </span>
+                </button>
+            </div>
+
+            <div id="videoControls" class="mt-8 flex flex-col items-center gap-3 hidden">
+                <p class="text-sm font-fredoka text-sky-900 font-bold tracking-widest uppercase bg-white/80 px-4 py-1.5 rounded-full border border-sky-300">Cargando alegría...</p>
+                <button id="skipBtn" onclick="revealMainInvitation()" class="px-6 py-2.5 text-xs font-fredoka text-slate-900 font-bold bg-white/90 hover:bg-white border-2 border-sky-400 rounded-full shadow-md transition-all">
+                    Omitir e Ingresar Directo <i data-lucide="chevron-right" class="inline w-4 h-4 ml-1 text-sky-600"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CONTENIDO PRINCIPAL DE LA INVITACIÓN       -->
+    <!-- ========================================== -->
+    <main id="mainInvitation" class="relative z-10 min-h-screen opacity-0 pointer-events-none transition-opacity duration-1000 pb-20">
+        
+        <!-- HEADER -->
+        <section class="relative min-h-[70vh] flex flex-col justify-center items-center text-center px-4 pt-12 pb-12 overflow-hidden">
+            <div class="sun-glow top-10 left-1/2 -translate-x-1/2 animate-pulse-glow"></div>
+            
+            <div class="inline-block p-2 border-4 border-dashed border-sky-400 rounded-full mb-6 animate-float-gentle bg-white/90 shadow-lg">
+                <div class="px-6 py-2 rounded-full bg-sky-100 border-2 border-sky-400">
+                    <span class="font-fredoka text-xs sm:text-sm font-extrabold tracking-widest text-sky-900 uppercase flex items-center gap-2">
+                        <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> IEI 894 Santa Marianita de los niños • 5 Años
+                    </span>
+                </div>
+            </div>
+
+            <h1 class="font-fredoka text-4xl sm:text-7xl font-extrabold text-slate-900 tracking-wide mb-3 drop-shadow-sm">
+                GRADUACIÓN <span class="gradient-title block sm:inline mt-2 sm:mt-0">INICIAL 2026</span>
+            </h1>
+
+            <p class="font-hand text-3xl sm:text-5xl text-pink-600 font-bold mb-6">Pequeños líderes del futuro</p>
+
+            <p class="max-w-xl text-slate-700 text-base sm:text-lg font-semibold leading-relaxed mb-8 px-6 bg-white/90 py-5 rounded-3xl border-4 border-sky-300 shadow-lg backdrop-blur-md">
+                Con mucha alegría y orgullo, nuestros 22 pequeños graduados de la Promoción Pequeños líderes del futuro celebran la culminación de esta hermosa etapa de 5 años.
+            </p>
+
+            <!-- Botón Audio -->
+            <button id="toggleAudioBtn" onclick="toggleAudio()" class="fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-sky-400 to-amber-400 border-4 border-white text-slate-900 shadow-2xl hover:scale-110 transition-transform flex items-center justify-center">
+                <i id="audioIcon" data-lucide="volume-2" class="w-7 h-7"></i>
+            </button>
+        </section>
+
+        <!-- TARJETA BIENVENIDA -->
+        <section class="max-w-4xl mx-auto px-4 mb-16">
+            <div class="glass-santo rounded-3xl p-8 sm:p-12 text-center relative shadow-2xl">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-sky-200 to-amber-200 border-4 border-sky-400 flex items-center justify-center mb-6 text-sky-600 animate-bounce-slow shadow-md">
+                    <i data-lucide="heart" class="w-10 h-10 text-pink-500 fill-current"></i>
+                </div>
+                <h2 class="font-fredoka text-2xl sm:text-4xl text-slate-900 font-extrabold tracking-wide mb-4">
+                    ¡ESTÁN CORDIALMENTE <span class="gradient-title">INVITADOS!</span>
+                </h2>
+                <p class="text-slate-700 text-base sm:text-lg font-semibold leading-relaxed max-w-2xl mx-auto mb-8">
+                    Vengan a acompañar y aplaudir a nuestros 22 pequeños en este momento tan especial para sus vidas.
+                </p>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="addToCalendar()" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-sky-500 via-amber-500 to-pink-500 text-white font-fredoka font-extrabold text-base tracking-wider hover:scale-105 transition-all shadow-xl border-2 border-white">
+                        <i data-lucide="calendar-plus" class="w-6 h-6 text-yellow-200"></i> Guardar en Google Calendar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CUENTA REGRESIVA -->
+        <section class="max-w-4xl mx-auto px-4 mb-16">
+            <div class="glass-santo rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-2xl">
+                <h3 class="font-fredoka text-xl sm:text-2xl text-sky-900 font-extrabold tracking-wider mb-6 uppercase flex items-center justify-center gap-2">
+                    <i data-lucide="timer" class="w-6 h-6 text-sky-600"></i> ¡Faltan Muy Pocos Días!
+                </h3>
+                
+                <div class="grid grid-cols-4 gap-2 sm:gap-6 max-w-2xl mx-auto">
+                    <div class="bg-gradient-to-b from-sky-500 to-sky-600 p-3 sm:p-5 rounded-2xl border-4 border-white shadow-lg text-white">
+                        <span id="cd-days" class="font-fredoka text-2xl sm:text-5xl font-black block">00</span>
+                        <span class="text-[10px] sm:text-xs text-sky-100 font-extrabold uppercase tracking-widest mt-1 block">Días</span>
+                    </div>
+                    <div class="bg-gradient-to-b from-amber-400 to-amber-500 p-3 sm:p-5 rounded-2xl border-4 border-white shadow-lg text-slate-900">
+                        <span id="cd-hours" class="font-fredoka text-2xl sm:text-5xl font-black block">00</span>
+                        <span class="text-[10px] sm:text-xs text-slate-900 font-extrabold uppercase tracking-widest mt-1 block">Horas</span>
+                    </div>
+                    <div class="bg-gradient-to-b from-pink-500 to-pink-600 p-3 sm:p-5 rounded-2xl border-4 border-white shadow-lg text-white">
+                        <span id="cd-minutes" class="font-fredoka text-2xl sm:text-5xl font-black block">00</span>
+                        <span class="text-[10px] sm:text-xs text-pink-100 font-extrabold uppercase tracking-widest mt-1 block">Minutos</span>
+                    </div>
+                    <div class="bg-gradient-to-b from-emerald-500 to-emerald-600 p-3 sm:p-5 rounded-2xl border-4 border-white shadow-lg text-white">
+                        <span id="cd-seconds" class="font-fredoka text-2xl sm:text-5xl font-black block">00</span>
+                        <span class="text-[10px] sm:text-xs text-emerald-100 font-extrabold uppercase tracking-widest mt-1 block">Segundos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETALLES DEL EVENTO -->
+        <section class="max-w-5xl mx-auto px-4 mb-16">
+            <h2 class="font-fredoka text-2xl sm:text-4xl text-center text-slate-900 font-extrabold tracking-wider mb-12">
+                DETALLES DE LA <span class="gradient-title">CELEBRACIÓN</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <div class="glass-santo rounded-3xl p-8 text-center flex flex-col items-center hover:border-sky-500 transition-all duration-300 sticker-badge">
+                    <div class="w-16 h-16 rounded-full bg-sky-100 border-3 border-sky-400 flex items-center justify-center mb-6 text-sky-600 shadow-sm">
+                        <i data-lucide="clock" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="font-fredoka text-lg font-extrabold text-sky-900 mb-2 uppercase tracking-wider">Fecha y Hora</h3>
+                    <p class="text-slate-900 font-bold text-lg">Miércoles, 02 de Diciembre</p>
+                    <p class="text-slate-700 font-semibold text-sm mt-1">Abrir la puerta: 06:30 PM</p>
+                    <p class="text-slate-600 font-medium text-xs">Hora de fotos: 07:00 - 08:00 PM | Ceremonia: 08:00 PM</p>
+                </div>
+
+                <div class="glass-santo rounded-3xl p-8 text-center flex flex-col items-center hover:border-sky-500 transition-all duration-300 sticker-badge">
+                    <div class="w-16 h-16 rounded-full bg-amber-100 border-3 border-amber-400 flex items-center justify-center mb-6 text-amber-600 shadow-sm">
+                        <i data-lucide="map-pin" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="font-fredoka text-lg font-extrabold text-amber-800 mb-2 uppercase tracking-wider">Ubicación</h3>
+                    <p class="text-slate-900 font-bold text-lg">Orquidia Dorada</p>
+                    <p class="text-slate-600 font-medium text-sm mt-1">Av. Chillón Trapiche 051, Comas 15316</p>
+                    <a href="https://www.google.com/maps/place/?q=place_id:ChIJ_fvvfPzRBZERNVtsrRCZYkA" target="_blank" class="mt-4 px-5 py-2 rounded-full bg-gradient-to-r from-sky-500 to-amber-500 text-white text-xs font-fredoka font-extrabold hover:scale-105 transition-all shadow-md">Abrir en Google Maps</a>
+                </div>
+
+                <div class="glass-santo rounded-3xl p-8 text-center flex flex-col items-center hover:border-sky-500 transition-all duration-300 sticker-badge">
+                    <div class="w-16 h-16 rounded-full bg-pink-100 border-3 border-pink-400 flex items-center justify-center mb-6 text-pink-600 shadow-sm">
+                        <i data-lucide="sparkles" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="font-fredoka text-lg font-extrabold text-pink-900 mb-2 uppercase tracking-wider">Vestimenta</h3>
+                    <p class="text-slate-900 font-bold text-lg">Gala Infantil / Elegante</p>
+                    <p class="text-slate-600 font-medium text-sm mt-1">Niñas: Vestido de Fiesta</p>
+                    <p class="text-slate-600 font-medium text-sm">Niños: Traje Formal</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PROGRAMA DE LA FIESTA -->
+        <section class="max-w-3xl mx-auto px-4 mb-16">
+            <h2 class="font-fredoka text-2xl sm:text-4xl text-center text-slate-900 font-extrabold tracking-wider mb-12">
+                PROGRAMA DE LA <span class="gradient-title">NOCHE</span>
+            </h2>
+
+            <div class="relative border-l-4 border-dashed border-sky-400 ml-28 sm:ml-48 space-y-8">
+                <div class="relative pl-6 sm:pl-8 flex flex-col justify-center min-h-[44px]">
+                    <span class="absolute -left-[13px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-sky-400 border-4 border-white shadow-md"></span>
+                    <span class="absolute -left-28 sm:-left-44 top-1/2 -translate-y-1/2 font-fredoka text-sky-900 font-extrabold text-xs sm:text-base text-right w-24 sm:w-40 pr-2">06:30 PM</span>
+                    <h4 class="font-fredoka text-base sm:text-lg font-extrabold text-slate-900 tracking-wide uppercase">Abrir la puerta</h4>
+                </div>
+                
+                <div class="relative pl-6 sm:pl-8 flex flex-col justify-center min-h-[44px]">
+                    <span class="absolute -left-[13px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-amber-500 border-4 border-white shadow-md"></span>
+                    <span class="absolute -left-28 sm:-left-44 top-1/2 -translate-y-1/2 font-fredoka text-amber-700 font-extrabold text-xs sm:text-base text-right w-24 sm:w-40 pr-2">07:00 - 08:00 PM</span>
+                    <h4 class="font-fredoka text-base sm:text-lg font-extrabold text-slate-900 tracking-wide uppercase">Hora de fotos</h4>
+                </div>
+                
+                <div class="relative pl-6 sm:pl-8 flex flex-col justify-center min-h-[44px]">
+                    <span class="absolute -left-[13px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-pink-500 border-4 border-white shadow-md"></span>
+                    <span class="absolute -left-28 sm:-left-44 top-1/2 -translate-y-1/2 font-fredoka text-pink-700 font-extrabold text-xs sm:text-base text-right w-24 sm:w-40 pr-2">08:00 PM</span>
+                    <h4 class="font-fredoka text-base sm:text-lg font-extrabold text-slate-900 tracking-wide uppercase">Ceremonia</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTA GRADUADOS -->
+        <section class="max-w-4xl mx-auto px-4 mb-16">
+            <div class="glass-santo rounded-3xl p-6 sm:p-10 text-center shadow-2xl">
+                <h2 class="font-fredoka text-2xl sm:text-3xl font-extrabold text-sky-900 mb-2">IEI 894 Santa Marianita de los niños</h2>
+                <p class="font-hand text-3xl sm:text-4xl font-bold text-pink-600 mb-4">Promoción Pequeños líderes del futuro (5 Años)</p>
+                <p class="text-slate-700 text-base font-semibold max-w-xl mx-auto mb-6">Conoce a los 22 pequeños graduados.</p>
+                
+                <button onclick="toggleGraduatesModal()" class="px-8 py-4 rounded-full bg-gradient-to-r from-sky-400 via-amber-400 to-pink-400 text-slate-900 font-fredoka font-black text-base hover:scale-105 transition-all shadow-xl border-3 border-white">
+                    <i data-lucide="users" class="inline w-5 h-5 mr-2"></i> Ver Lista de los 22 Graduados
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center text-slate-600 text-xs font-fredoka font-bold border-t-2 border-sky-200 pt-8 max-w-4xl mx-auto px-4">
+            <p>IEI 894 SANTA MARIANITA DE LOS NIÑOS • PROMOCIÓN PEQUEÑOS LÍDERES DEL FUTURO 2026</p>
+            <p class="mt-2 text-sky-800 font-semibold">¡Los esperamos con mucho cariño!</p>
+        </footer>
+    </main>
+
+    <!-- MODAL GRADUADOS -->
+    <div id="graduatesModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-santo rounded-3xl max-w-2xl w-full max-h-[80vh] flex flex-col p-6 border-4 border-sky-400 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b-2 border-sky-200 pb-4">
+                <div>
+                    <h3 class="font-fredoka text-2xl font-extrabold text-sky-900">Nuestros Pequeños Graduados</h3>
+                    <p class="text-xs text-pink-600 font-fredoka font-bold">5 Años • 22 Niños</p>
+                </div>
+                <button onclick="toggleGraduatesModal()" class="text-slate-400 hover:text-slate-800 p-2">
+                    <i data-lucide="x" class="w-7 h-7"></i>
+                </button>
+            </div>
+            
+            <div id="graduatesList" class="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3 pr-2 text-sm">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 22 NIÑOS GRADUADOS (LISTA OFICIAL DEL PDF)
+        const graduados = [
+            "Bastian",
+            "Oriana",
+            "Abril",
+            "Samir",
+            "Aithana",
+            "Andryu",
+            "Emily",
+            "Catalina",
+            "Kerín",
+            "Yamileth",
+            "Santiago",
+            "Giorgio",
+            "Gia",
+            "Jordy",
+            "Antuaneth",
+            "Liam",
+            "Valentina",
+            "Kerly",
+            "Amy",
+            "Camila",
+            "Ythan",
+            "Esther"
+        ];
+
+        window.playCinematicVideo = function() {
+            const introAction = document.getElementById('introAction');
+            const videoControls = document.getElementById('videoControls');
+            if (introAction) introAction.classList.add('hidden');
+            if (videoControls) videoControls.classList.remove('hidden');
+            
+            if (!audioCtx) {
+                initAmbientMusic();
+            } else if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isAnimationRunning = true;
+            animProgress = 0;
+            if (typeof animFrameId !== 'undefined' && animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+            if (typeof renderIntroLoop === 'function') {
+                renderIntroLoop();
+            }
+        };
+
+        window.revealMainInvitation = function() {
+            isAnimationRunning = false;
+            if (typeof animFrameId !== 'undefined' && animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+
+            const videoScreen = document.getElementById('videoIntroScreen');
+            const mainScreen = document.getElementById('mainInvitation');
+
+            if (videoScreen) videoScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                if (videoScreen) videoScreen.classList.add('hidden');
+                if (mainScreen) {
+                    mainScreen.classList.remove('pointer-events-none');
+                    mainScreen.classList.remove('opacity-0');
+                }
+
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 150,
+                        spread: 90,
+                        origin: { y: 0.6 },
+                        colors: ['#0284C7', '#38BDF8', '#F59E0B', '#EC4899']
+                    });
+                }
+            }, 1000);
+        };
+
+        window.toggleGraduatesModal = function() {
+            const modal = document.getElementById('graduatesModal');
+            if (modal) modal.classList.toggle('hidden');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+
+            const startBtn = document.getElementById('startExperienceBtn');
+            if (startBtn) {
+                startBtn.onclick = function(e) {
+                    e.preventDefault();
+                    window.playCinematicVideo();
+                };
+            }
+
+            const skipBtn = document.getElementById('skipBtn');
+            if (skipBtn) {
+                skipBtn.onclick = function(e) {
+                    e.preventDefault();
+                    window.revealMainInvitation();
+                };
+            }
+
+            const gradListContainer = document.getElementById('graduatesList');
+            if (gradListContainer) {
+                gradListContainer.innerHTML = '';
+                graduados.forEach((nombre, idx) => {
+                    const item = document.createElement('div');
+                    item.className = "p-3 bg-sky-50 rounded-2xl border-2 border-sky-300 flex items-center gap-3 shadow-sm";
+                    item.innerHTML = `<span class="w-7 h-7 rounded-full bg-sky-400 text-white font-extrabold font-fredoka text-xs flex items-center justify-center border border-white shadow-sm">${idx+1}</span> <span class="uppercase text-xs sm:text-sm font-bold text-slate-800">${nombre}</span>`;
+                    gradListContainer.appendChild(item);
+                });
+            }
+        });
+
+        // ANIMACIÓN 2D ILUSTRADA - SOL Y NUBES
+        const animCanvas = document.getElementById('animationCanvas');
+        const animCtx = animCanvas ? animCanvas.getContext('2d') : null;
+        let animFrameId = null;
+        let animProgress = 0;
+        let isAnimationRunning = false;
+
+        function resizeAnimCanvas() {
+            if (!animCanvas) return;
+            animCanvas.width = window.innerWidth;
+            animCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeAnimCanvas);
+        resizeAnimCanvas();
+
+        function drawSunScene(progress) {
+            if (!animCanvas || !animCtx) return;
+            const w = animCanvas.width;
+            const h = animCanvas.height;
+            animCtx.clearRect(0, 0, w, h);
+
+            // Fondo de cielo azul pastel
+            const skyGrad = animCtx.createLinearGradient(0, 0, 0, h);
+            skyGrad.addColorStop(0, '#BAE6FD');
+            skyGrad.addColorStop(0.5, '#E0F2FE');
+            skyGrad.addColorStop(1, '#FEF08A');
+            animCtx.fillStyle = skyGrad;
+            animCtx.fillRect(0, 0, w, h);
+
+            // Sol Dulce
+            const cx = w / 2;
+            const cy = h * 0.35;
+            const radius = Math.min(w, h) * 0.16;
+
+            animCtx.shadowBlur = 40;
+            animCtx.shadowColor = 'rgba(251, 191, 36, 0.8)';
+
+            animCtx.fillStyle = '#FBBF24';
+            animCtx.beginPath();
+            animCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+            animCtx.fill();
+
+            // Rayos del sol
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * Math.PI / 6) + progress;
+                const rx = cx + Math.cos(angle) * (radius + 20);
+                const ry = cy + Math.sin(angle) * (radius + 20);
+                animCtx.fillStyle = '#F59E0B';
+                animCtx.beginPath();
+                animCtx.arc(rx, ry, 10, 0, Math.PI * 2);
+                animCtx.fill();
+            }
+
+            // Ojos y sonrisa
+            animCtx.shadowBlur = 0;
+            animCtx.fillStyle = '#0F172A';
+            animCtx.beginPath();
+            animCtx.arc(cx - radius * 0.3, cy - radius * 0.05, radius * 0.1, 0, Math.PI * 2);
+            animCtx.arc(cx + radius * 0.3, cy - radius * 0.05, radius * 0.1, 0, Math.PI * 2);
+            animCtx.fill();
+
+            animCtx.strokeStyle = '#0F172A';
+            animCtx.lineWidth = 5;
+            animCtx.beginPath();
+            animCtx.arc(cx, cy + radius * 0.1, radius * 0.35, 0.1 * Math.PI, 0.9 * Math.PI);
+            animCtx.stroke();
+        }
+
+        function renderIntroLoop() {
+            if (!isAnimationRunning) return;
+            animProgress += 0.012;
+            drawSunScene(animProgress);
+            if (animProgress >= 1) {
+                window.revealMainInvitation();
+            } else {
+                animFrameId = requestAnimationFrame(renderIntroLoop);
+            }
+        }
+
+        drawSunScene(0);
+
+        // PARTÍCULAS
+        const canvas = document.getElementById('particlesCanvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        let particles = [];
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                if (!canvas) return;
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 2;
+                this.color = ['#0284C7', '#38BDF8', '#F59E0B', '#EC4899'][Math.floor(Math.random() * 4)];
+                this.speedY = Math.random() * -0.5 - 0.2;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.8 + 0.2;
+            }
+            update() {
+                if (!canvas) return;
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y < 0) { this.reset(); this.y = canvas.height + 10; }
+            }
+            draw() {
+                if (!ctx) return;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        for (let i = 0; i < 50; i++) { particles.push(new Particle()); }
+
+        function animateParticles() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // MÚSICA SINTETIZADA
+        let audioCtx = null;
+        let isPlayingAudio = false;
+        let musicalInterval = null;
+
+        function initAmbientMusic() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (musicalInterval) return;
+
+            try {
+                const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 392.00];
+                let idx = 0;
+
+                function playKidNote() {
+                    if (!audioCtx || audioCtx.state !== 'running') return;
+                    const freq = notes[idx % notes.length];
+                    const now = audioCtx.currentTime;
+
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+
+                    idx++;
+                }
+
+                musicalInterval = setInterval(playKidNote, 440);
+                isPlayingAudio = true;
+                updateAudioIcon();
+            } catch (e) {
+                console.log("Audio no disponible", e);
+            }
+        }
+
+        window.toggleAudio = function() {
+            if (!audioCtx) { initAmbientMusic(); return; }
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); isPlayingAudio = true; }
+            else if (audioCtx.state === 'running') { audioCtx.suspend(); isPlayingAudio = false; }
+            updateAudioIcon();
+        };
+
+        function updateAudioIcon() {
+            const icon = document.getElementById('audioIcon');
+            if (icon) {
+                icon.setAttribute('data-lucide', isPlayingAudio ? 'volume-2' : 'volume-x');
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        // DETENER MÚSICA AL SALIR
+        function stopAllAudio() {
+            if (musicalInterval) {
+                clearInterval(musicalInterval);
+                musicalInterval = null;
+            }
+            if (audioCtx) {
+                audioCtx.suspend();
+                isPlayingAudio = false;
+                updateAudioIcon();
+            }
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopAllAudio();
+            }
+        });
+
+        window.addEventListener('pagehide', stopAllAudio);
+        window.addEventListener('beforeunload', stopAllAudio);
+        window.addEventListener('blur', stopAllAudio);
+
+        // GOOGLE CALENDAR
+        window.addToCalendar = function() {
+            const title = encodeURIComponent("Graduación Promoción Pequeños líderes del futuro - IEI 894 Santa Marianita de los niños");
+            const details = encodeURIComponent("Celebración de la Graduación (5 Años).\n- 06:30 PM: Abrir la puerta\n- 07:00 - 08:00 PM: Hora de fotos\n- 08:00 PM: Ceremonia");
+            const location = encodeURIComponent("Orquidia Dorada, Av. Chillón Trapiche 051, Comas 15316");
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=20261202T233000Z/20261203T030000Z&details=${details}&location=${location}`;
+            window.open(url, '_blank');
+        };
+
+        window.onload = function() {
+            setTimeout(() => {
+                const logo = document.getElementById('introLogo');
+                if (logo) logo.classList.remove('opacity-0', 'translate-y-6');
+            }, 300);
+        };
+
+        // CUENTA REGRESIVA (2 de Diciembre de 2026 - 6:30 PM)
+        const eventDate = new Date("December 2, 2026 18:30:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = eventDate - now;
+
+            const daysEl = document.getElementById("cd-days");
+            const hoursEl = document.getElementById("cd-hours");
+            const minEl = document.getElementById("cd-minutes");
+            const secEl = document.getElementById("cd-seconds");
+
+            if (!daysEl || !hoursEl || !minEl || !secEl) return;
+
+            if (diff <= 0) {
+                daysEl.innerText = "00";
+                hoursEl.innerText = "00";
+                minEl.innerText = "00";
+                secEl.innerText = "00";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            daysEl.innerText = days.toString().padStart(2, '0');
+            hoursEl.innerText = hours.toString().padStart(2, '0');
+            minEl.innerText = minutes.toString().padStart(2, '0');
+            secEl.innerText = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
